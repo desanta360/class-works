@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Transaction Tracker</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid black;
+    box-shadow: 2px 3px #033dfa;
+    background-color: bisque;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  label {
+    margin-bottom: 5px;
+  }
+  input, select {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  button {
+    padding: 10px 20px;
+    background-color: #0b41f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #033dfa;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+</style>
+</head>
+<body>
+
+<h1> UR MONONEY Tracker</h1>
+
+<div class="container">
+  <form id="transactionForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required>
+    <label for="transactionType">Transaction Type:</label>
+    <select id="transactionType" required>
+      <option value="sent">Send</option>
+      <option value="received">Receive</option>
+    </select>
+    <label for="description">Description:</label>
+    <input type="text" id="description" required>
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" min="0" step="0.01" required>
+    <button type="submit">Add Transaction</button>
+  </form>
+
+  <label for="search">Search:</label>
+  <input type="text" id="search">
+  <label for="searchType">Search Type:</label>
+  <select id="searchType">
+    <option value="all">All</option>
+    <option value="sent">Sent</option>
+    <option value="received">Received</option>
+  </select>
+  <button onclick="searchTransactions()">Search</button>
+
+  <table id="transactionTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="transactionBody">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  let transactions = [];
+
+  const transactionForm = document.getElementById('transactionForm');
+  transactionForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value;
+    const type = document.getElementById('transactionType').value;
+    const description = document.getElementById('description').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const date = new Date().toLocaleDateString();
+    transactions.push({ name, type, description, amount, date });
+    updateTransactionTable();
+    transactionForm.reset();
+  });
+
+  function updateTransactionTable() {
+    const tableBody = document.getElementById('transactionBody');
+    tableBody.innerHTML = '';
+    transactions.forEach(transaction => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${transaction.name}</td>
+        <td>${transaction.type}</td>
+        <td>${transaction.description}</td>
+        <td>${transaction.amount.toFixed(2)}</td>
+        <td>${transaction.date}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  function searchTransactions() {
+    const searchTerm = document.getElementById('search').value.toLowerCase();
+    const searchType = document.getElementById('searchType').value;
+    
+    let filteredTransactions = [];
+    
+    if (searchType === 'all') {
+      filteredTransactions = transactions.filter(transaction =>
+        transaction.description.toLowerCase().includes(searchTerm)
+      );
+    } else {
+      filteredTransactions = transactions.filter(transaction =>
+        transaction.type === searchType && transaction.description.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    const tableBody = document.getElementById('transactionBody');
+    tableBody.innerHTML = '';
+    filteredTransactions.forEach(transaction => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${transaction.name}</td>
+        <td>${transaction.type}</td>
+        <td>${transaction.description}</td>
+        <td>${transaction.amount.toFixed(2)}</td>
+        <td>${transaction.date}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+</script>
+
+</body>
+</html>
